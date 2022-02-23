@@ -136,6 +136,100 @@ func AreSimilar(selection1, selection2 Data, deviation float64) bool {
 	return true
 }
 
+type combineNode struct {
+	header        []Scale
+	generalLength int   // this is the total number of objects
+	startPointers []int // len(startPointers) == len(sources)-1
+	sources       []Data
+}
+
+func (node *combineNode) Length() int {
+	return node.generalLength
+}
+
+func (node *combineNode) Dimension() int {
+	return len(node.header)
+}
+
+func (node *combineNode) Scale(p int) Scale {
+	if p < 0 || p >= len(node.header) {
+		return IndefiniteScale
+	}
+
+	return node.header[p]
+}
+
+func (node *combineNode) Value(o, p int) interface{} {
+
+	if o < 0 || o >= node.generalLength {
+		return nil
+	}
+
+	if len(node.sources) == 1 || o < node.startPointers[0] {
+		return node.sources[0].Value(o, p)
+	}
+
+	for i := 0; i < len(node.startPointers)-1; i++ {
+		if o >= node.startPointers[i] && o < node.startPointers[i+1] {
+			return node.sources[i+1].Value(o-node.startPointers[i], p)
+		}
+	}
+
+	return node.sources[len(node.sources)-1].Value(o-node.startPointers[len(node.startPointers)-1], p)
+}
+
+// Combine combines objects from several selections into one, provided that they have the same headers.
+func Combine(selections ...Data) Data {
+
+	if len(selections) == 0 || selections[0] == nil {
+		return nil
+	}
+
+	var dimension = selections[0].Dimension()
+	var length = selections[0].Length()
+
+	if dimension < 0 || length < 0 {
+		return nil
+	}
+
+	node := new(combineNode)
+	node.header = make([]Scale, dimension)
+	node.generalLength = selections[0].Length()
+	node.sources = selections
+	if len(selections) > 1 {
+		node.startPointers = make([]int, len(selections)-1)
+	}
+
+	for i := 0; i < dimension; i++ {
+		node.header[i] = selections[0].Scale(i)
+	}
+
+	// checking the others selections and writing values in the node
+	for i := 1; i < len(selections); i++ {
+
+		if selections[i] == nil {
+			return nil
+		}
+
+		length := selections[i].Length()
+		if dimension != selections[i].Dimension() || length < 0 {
+			return nil
+		}
+
+		// checking the equivalence of headers
+		for j := 0; j < dimension; j++ {
+			if node.header[j] != selections[i].Scale(j) {
+				return nil
+			}
+		}
+
+		node.startPointers[i-1] = node.generalLength
+		node.generalLength += length
+	}
+
+	return node
+}
+
 func interfaceToFloat64(source interface{}) (float64, bool) {
 
 	var value float64 = math.NaN()
