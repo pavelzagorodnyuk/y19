@@ -270,3 +270,59 @@ func BenchmarkAreSimilar(b *testing.B) {
 		AreSimilar(mainTableA, mainTableA, 0)
 	}
 }
+
+var CombineNodeTests = nodeTests{
+	// #0
+	{
+		original: tableB{
+			{1000, "Name0", "Lastname0", false, 10},
+			{1001, "Name1", "Lastname1", true, 11},
+			{1002, "Name2", "Lastname2", false, 12},
+			{1003, "Name3", "Lastname3", true, 13},
+			{1004, "Name4", "Lastname4", false, 14},
+			{1005, "Name5", "Lastname5", true, 15},
+		},
+		node: &combineNode{
+			header:        []Scale{AbsoluteScale, NominalScale, NominalScale, NominalScale, NominalScale},
+			generalLength: 6,
+			startPointers: []int{2, 2, 4},
+			sources: []Data{
+				tableB{
+					{1000, "Name0", "Lastname0", false, 10},
+					{1001, "Name1", "Lastname1", true, 11},
+				},
+				tableB{},
+				tableB{
+					{1002, "Name2", "Lastname2", false, 12},
+					{1003, "Name3", "Lastname3", true, 13},
+				},
+				tableB{
+					{1004, "Name4", "Lastname4", false, 14},
+					{1005, "Name5", "Lastname5", true, 15},
+				},
+			},
+		},
+	},
+	// #1
+	{
+		original: tableB{
+			{1000, "Name0", "Lastname0", false, 10},
+			{1001, "Name1", "Lastname1", true, 11},
+		},
+		node: &combineNode{
+			header:        []Scale{AbsoluteScale, NominalScale, NominalScale, NominalScale, NominalScale},
+			generalLength: 2,
+			startPointers: nil,
+			sources: []Data{
+				tableB{
+					{1000, "Name0", "Lastname0", false, 10},
+					{1001, "Name1", "Lastname1", true, 11},
+				},
+			},
+		},
+	},
+}
+
+func TestCombineNode(t *testing.T) {
+	nodeTest(t, CombineNodeTests, "CombineNode")
+}
