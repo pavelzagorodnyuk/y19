@@ -326,3 +326,120 @@ var CombineNodeTests = nodeTests{
 func TestCombineNode(t *testing.T) {
 	nodeTest(t, CombineNodeTests, "CombineNode")
 }
+
+var CombineTests = []struct {
+	fullTable  Data
+	tableParts []Data
+}{
+	// #0-#2
+	{
+		fullTable: mainTableA,
+		tableParts: []Data{
+			tableA{
+				{0.00, 10.00, "a", true, -64 + 0, -64 + 0, -32 + 0, -16 + 0, -8 + 0, 64 + 0, 64 + 0, 32 + 0, 16 + 0, 8 + 0},
+				{0.01, 11.01, "b", true, -64 + 1, -64 + 1, -32 + 1, -16 + 1, -8 + 1, 64 + 1, 64 + 1, 32 + 1, 16 + 1, 8 + 1},
+				{0.02, 12.02, "c", true, -64 + 2, -64 + 2, -32 + 2, -16 + 2, -8 + 2, 64 + 2, 64 + 2, 32 + 2, 16 + 2, 8 + 2},
+				{0.03, 13.03, "d", true, -64 + 3, -64 + 3, -32 + 3, -16 + 3, -8 + 3, 64 + 3, 64 + 3, 32 + 3, 16 + 3, 8 + 3},
+				{0.04, 14.04, "e", true, -64 + 4, -64 + 4, -32 + 4, -16 + 4, -8 + 4, 64 + 4, 64 + 4, 32 + 4, 16 + 4, 8 + 4},
+			},
+			tableA{
+				{0.05, 15.05, "f", true, -64 + 5, -64 + 5, -32 + 5, -16 + 5, -8 + 5, 64 + 5, 64 + 5, 32 + 5, 16 + 5, 8 + 5},
+				{0.06, 16.06, "g", true, -64 + 6, -64 + 6, -32 + 6, -16 + 6, -8 + 6, 64 + 6, 64 + 6, 32 + 6, 16 + 6, 8 + 6},
+				{0.07, 17.07, "h", true, -64 + 7, -64 + 7, -32 + 7, -16 + 7, -8 + 7, 64 + 7, 64 + 7, 32 + 7, 16 + 7, 8 + 7},
+				{0.00, 10.00, "a", true, -64 + 0, -64 + 0, -32 + 0, -16 + 0, -8 + 0, 64 + 0, 64 + 0, 32 + 0, 16 + 0, 8 + 0},
+			},
+		},
+	},
+	{
+		fullTable: mainTableB,
+		tableParts: []Data{
+			tableB{
+				{0, "Name0", "Lastname0", false, 10},
+				{1, "Name1", "Lastname1", false, 11},
+				{2, "Name2", "Lastname2", false, 12},
+				{3, "Name3", "Lastname3", false, 13},
+				{4, "Name4", "Lastname4", false, 14},
+			},
+			tableB{
+				{5, "Name5", "Lastname5", false, 15},
+				{6, "Name6", "Lastname6", false, 16},
+				{7, "Name7", "Lastname7", false, 17},
+				{0, "Name0", "Lastname0", false, 10},
+			},
+		},
+	},
+	{
+		fullTable: mainTableC,
+		tableParts: []Data{
+			tableC{
+				{1000, "Title0", 0.0, 1.0, 50},
+				{1001, "Title1", 0.1, 1.1, 51},
+				{1002, "Title2", 0.2, 1.2, 52},
+				{1003, "Title3", 0.3, 1.3, 53},
+				{1004, "Title4", 0.4, 1.4, 54},
+			},
+			tableC{
+				{1005, "Title5", 0.5, 1.5, 55},
+				{1006, "Title6", 0.6, 1.6, 56},
+				{1007, "Title7", 0.7, 1.7, 57},
+				{1000, "Title0", 0.0, 1.0, 50},
+			},
+		},
+	},
+
+	// #3, #4
+	{fullTable: emptyTable, tableParts: []Data{emptyTable, emptyTable}},
+	{fullTable: nil, tableParts: []Data{mainTableX, mainTableX}},
+
+	// #5-#7
+	{fullTable: nil, tableParts: []Data{mainTableA, mainTableA, nil}},
+	{fullTable: nil, tableParts: []Data{mainTableA, nil, mainTableA}},
+	{fullTable: nil, tableParts: []Data{nil, mainTableA, mainTableA}},
+
+	// #8-#10
+	{fullTable: nil, tableParts: []Data{mainTableA, mainTableB}},
+	{fullTable: nil, tableParts: []Data{mainTableA, mainTableC}},
+	{fullTable: nil, tableParts: []Data{mainTableB, mainTableC}},
+
+	// #11
+	{
+		fullTable: mainTableA,
+		tableParts: []Data{
+			tableA{
+				{0.00, 10.00, "a", true, -64 + 0, -64 + 0, -32 + 0, -16 + 0, -8 + 0, 64 + 0, 64 + 0, 32 + 0, 16 + 0, 8 + 0},
+				{0.01, 11.01, "b", true, -64 + 1, -64 + 1, -32 + 1, -16 + 1, -8 + 1, 64 + 1, 64 + 1, 32 + 1, 16 + 1, 8 + 1},
+				{0.02, 12.02, "c", true, -64 + 2, -64 + 2, -32 + 2, -16 + 2, -8 + 2, 64 + 2, 64 + 2, 32 + 2, 16 + 2, 8 + 2},
+				{0.03, 13.03, "d", true, -64 + 3, -64 + 3, -32 + 3, -16 + 3, -8 + 3, 64 + 3, 64 + 3, 32 + 3, 16 + 3, 8 + 3},
+				{0.04, 14.04, "e", true, -64 + 4, -64 + 4, -32 + 4, -16 + 4, -8 + 4, 64 + 4, 64 + 4, 32 + 4, 16 + 4, 8 + 4},
+			},
+			emptyTable,
+			tableA{
+				{0.05, 15.05, "f", true, -64 + 5, -64 + 5, -32 + 5, -16 + 5, -8 + 5, 64 + 5, 64 + 5, 32 + 5, 16 + 5, 8 + 5},
+				{0.06, 16.06, "g", true, -64 + 6, -64 + 6, -32 + 6, -16 + 6, -8 + 6, 64 + 6, 64 + 6, 32 + 6, 16 + 6, 8 + 6},
+				{0.07, 17.07, "h", true, -64 + 7, -64 + 7, -32 + 7, -16 + 7, -8 + 7, 64 + 7, 64 + 7, 32 + 7, 16 + 7, 8 + 7},
+				{0.00, 10.00, "a", true, -64 + 0, -64 + 0, -32 + 0, -16 + 0, -8 + 0, 64 + 0, 64 + 0, 32 + 0, 16 + 0, 8 + 0},
+			},
+		},
+	},
+}
+
+func TestCombine(t *testing.T) {
+	for index, test := range CombineTests {
+		result := Combine(test.tableParts...)
+
+		if test.fullTable == nil && result != nil || test.fullTable != nil && result == nil {
+			t.Errorf("[test %d] error in the test", index)
+			continue
+		}
+
+		if test.fullTable != nil && !AreEqual(test.fullTable, result) {
+			t.Errorf("[test %d] combined selections does not equal the expected one", index)
+		}
+	}
+}
+
+func BenchmarkCombine(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		Combine(mainTableA, mainTableA)
+	}
+}
