@@ -1,6 +1,60 @@
 package y19
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
+
+type nodeTests []struct {
+	original, node Data
+}
+
+func nodeTest(t *testing.T, tests nodeTests, nodeName string) {
+	for index, test := range tests {
+
+		// checking the node methods
+		if test.node.Length() != test.original.Length() {
+			t.Fatalf("[test %d] %s.Length() is not equal to the expected length\n"+
+				"\tExpected: %d\n\tGot: %d\n", index, nodeName, test.original.Length(), test.node.Length())
+		}
+
+		if test.node.Dimension() != test.original.Dimension() {
+			t.Fatalf("[test %d] %s.Dimension() is not equal to the expected dimension\n"+
+				"\tExpected: %d\n\tGot: %d\n", index, nodeName, test.original.Dimension(), test.node.Dimension())
+		}
+
+		if test.node.Scale(-1) != IndefiniteScale {
+			t.Errorf("[test %d] %s.Scale(-1) is not equal to IndefiniteScale\n\tGot: %v",
+				index, nodeName, test.node.Scale(-1))
+		}
+
+		if test.node.Scale(test.node.Dimension()) != IndefiniteScale {
+			t.Errorf("[test %d] %s.Scale(%s.Dimension()) is not equal to IndefiniteScale\n\tGot: %v",
+				index, nodeName, nodeName, test.node.Scale(test.node.Dimension()))
+		}
+
+		for p := 0; p < test.original.Dimension(); p++ {
+			if test.node.Scale(p) != test.original.Scale(p) {
+				t.Errorf("[test %d] %s.Scale(%d) is not equal to the origin\n"+
+					"\tExpected: %v\n\tGot: %v\n", index, nodeName, p, test.original.Scale(p), test.node.Scale(p))
+				break
+			}
+		}
+
+		for i := -3; i < test.original.Length()+3; i++ {
+			for j := -3; j < test.original.Dimension()+3; j++ {
+				if i < 0 || i >= test.original.Length() || j < 0 || j >= test.original.Dimension() {
+					if test.node.Value(i, j) != nil {
+						t.Fatalf("[test %d] %s.Value(%d, %d) is not equal to nil", index, nodeName, i, j)
+					}
+				} else if !reflect.DeepEqual(test.node.Value(i, j), test.original.Value(i, j)) {
+					t.Fatalf("[test %d] %s.Value(%d, %d) is not equal to the expected value\n"+
+						"\tExpected: %v\n\tGot: %v\n", index, nodeName, i, j, test.original.Value(i, j), test.node.Value(i, j))
+				}
+			}
+		}
+	}
+}
 
 var AreEqualTests = []struct {
 	selectionOne, selectionTwo Data
