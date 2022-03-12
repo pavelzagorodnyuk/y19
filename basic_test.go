@@ -443,3 +443,32 @@ func BenchmarkCombine(b *testing.B) {
 		Combine(mainTableA, mainTableA)
 	}
 }
+
+var RSNodeTests = nodeTests{
+	// #0
+	{
+		original: tableA{
+			{0.00, 10.00, "a", true, -64 + 0, -64 + 0, -32 + 0, -16 + 0, -8 + 0, 64 + 0, 64 + 0, 32 + 0, 16 + 0, 8 + 0},
+			{0.03, 13.03, "d", true, -64 + 3, -64 + 3, -32 + 3, -16 + 3, -8 + 3, 64 + 3, 64 + 3, 32 + 3, 16 + 3, 8 + 3},
+			{0.04, 14.04, "e", true, -64 + 4, -64 + 4, -32 + 4, -16 + 4, -8 + 4, 64 + 4, 64 + 4, 32 + 4, 16 + 4, 8 + 4},
+			{0.05, 15.05, "f", true, -64 + 5, -64 + 5, -32 + 5, -16 + 5, -8 + 5, 64 + 5, 64 + 5, 32 + 5, 16 + 5, 8 + 5},
+			{0.07, 17.07, "h", true, -64 + 7, -64 + 7, -32 + 7, -16 + 7, -8 + 7, 64 + 7, 64 + 7, 32 + 7, 16 + 7, 8 + 7},
+		},
+		node: &rsNode{
+			Data:       mainTableA,
+			allocation: []int{0, 3, 4, 5, 7},
+		},
+	},
+	// #1
+	{
+		original: emptyTable,
+		node: &rsNode{
+			Data:       mainTableA,
+			allocation: []int{},
+		},
+	},
+}
+
+func TestRSNode(t *testing.T) {
+	nodeTest(t, RSNodeTests, "rsNode")
+}
