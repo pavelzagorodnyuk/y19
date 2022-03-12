@@ -2,6 +2,7 @@ package y19
 
 import (
 	"math"
+	"math/rand"
 	"reflect"
 )
 
@@ -228,6 +229,87 @@ func Combine(selections ...Data) Data {
 	}
 
 	return node
+}
+
+type rsNode struct {
+	Data
+	allocation []int
+}
+
+func (data *rsNode) Length() int {
+	return len(data.allocation)
+}
+
+func (data *rsNode) Value(o, p int) interface{} {
+	if o < 0 || o >= len(data.allocation) {
+		return nil
+	}
+	return data.Data.Value(data.allocation[o], p)
+}
+
+// RandomSelection returns a subsample of n random objects from the selection as the first value
+// and a subsample of all other objects as the second value.
+func RandomSelection(selection Data, n int) (Data, Data) {
+
+	if selection == nil {
+		return nil, nil
+	}
+
+	var originalLength = selection.Length()
+	if originalLength < 0 {
+		return nil, nil
+	}
+
+	if n <= 0 {
+		return &rsNode{Data: selection, allocation: []int{}}, selection
+	} else if n >= originalLength {
+		return selection, &rsNode{Data: selection, allocation: []int{}}
+	}
+
+	var k int
+	var reverse bool
+	if n <= originalLength-n {
+		k = n
+	} else {
+		reverse = true
+		k = originalLength - n
+	}
+
+	basicSlice := make([]int, originalLength)
+	allocationOne := basicSlice[:k]
+	allocationTwo := basicSlice[k:]
+	indexMap := make(map[int]struct{}, k)
+
+	// filling in the comparison for the first selection
+	for i := 0; i < k; i++ {
+		number := rand.Intn(originalLength)
+
+		if _, ok := indexMap[number]; ok {
+			i--
+			continue
+		}
+
+		allocationOne[i] = number
+		indexMap[number] = struct{}{}
+	}
+
+	// filling in the comparison for the second selection
+	for i, j := 0, 0; i < originalLength; i++ {
+		if _, ok := indexMap[i]; !ok {
+			allocationTwo[j] = i
+			j++
+		}
+	}
+
+	var selection1 = &rsNode{Data: selection, allocation: allocationOne}
+	var selection2 = &rsNode{Data: selection, allocation: allocationTwo}
+
+	if reverse {
+		selection1.allocation = allocationTwo
+		selection2.allocation = allocationOne
+	}
+
+	return selection1, selection2
 }
 
 func interfaceToFloat64(source interface{}) (float64, bool) {
