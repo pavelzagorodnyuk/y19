@@ -472,3 +472,90 @@ var RSNodeTests = nodeTests{
 func TestRSNode(t *testing.T) {
 	nodeTest(t, RSNodeTests, "rsNode")
 }
+
+var RandomSelectionTests = []struct {
+	selection Data
+	n         int
+	isError   bool
+}{
+	// #0-#5
+	{selection: mainTableA, n: mainTableA.Length() / 2, isError: false},
+	{selection: mainTableB, n: mainTableB.Length() / 2, isError: false},
+	{selection: mainTableC, n: mainTableC.Length() / 2, isError: false},
+	{selection: mainTableA, n: mainTableA.Length()/2 + 1, isError: false},
+	{selection: mainTableB, n: mainTableB.Length()/2 + 1, isError: false},
+	{selection: mainTableC, n: mainTableC.Length()/2 + 1, isError: false},
+
+	// #6-#9
+	{selection: emptyTable, n: 5, isError: false},
+	{selection: emptyTable, n: 0, isError: false},
+	{selection: mainTableX, n: 5, isError: true},
+	{selection: mainTableX, n: 0, isError: true},
+
+	// #10
+	{selection: nil, n: 5, isError: true},
+
+	// #11-#14
+	{selection: mainTableA, n: 0, isError: false},
+	{selection: mainTableA, n: mainTableA.Length(), isError: false},
+	{selection: mainTableA, n: -1, isError: false},
+	{selection: mainTableA, n: mainTableA.Length() + 1, isError: false},
+}
+
+func TestRandomSelection(t *testing.T) {
+	for index, test := range RandomSelectionTests {
+
+		partOne, partTwo := RandomSelection(test.selection, test.n)
+
+		if !test.isError && (partOne == nil || partTwo == nil) ||
+			test.isError && (partOne != nil || partTwo != nil) {
+
+			t.Errorf("[test %d] error in the test", index)
+			continue
+		}
+
+		if test.isError {
+			continue
+		}
+
+		var lengthOne, lengthTwo int
+		switch {
+		case test.n <= 0:
+			lengthOne = 0
+			lengthTwo = test.selection.Length()
+
+		case test.n >= test.selection.Length():
+			lengthOne = test.selection.Length()
+			lengthTwo = 0
+
+		default:
+			lengthOne = test.n
+			lengthTwo = test.selection.Length() - test.n
+		}
+
+		if partOne.Length() != lengthOne || partTwo.Length() != lengthTwo {
+			t.Errorf("[test %d] the lengths of the resulting selections differ from the expected ones\n"+
+				"\tthe first selection: expected %d, got %d\n"+
+				"\tthe second selection: expected %d, got %d",
+				index, lengthOne, partOne.Length(), lengthTwo, partTwo.Length())
+			continue
+		}
+
+		joinedSelections := Combine(partOne, partTwo)
+
+		if joinedSelections == nil {
+			t.Errorf("[test %d] failed combine selections for verification", index)
+			continue
+		}
+
+		if !AreEqual(test.selection, joinedSelections) {
+			t.Errorf("[test %d] the objects of the original selection are distributed incorrectly", index)
+		}
+	}
+}
+
+func BenchmarkRandomSelection(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		RandomSelection(mainTableA, i%mainTableA.Length())
+	}
+}
