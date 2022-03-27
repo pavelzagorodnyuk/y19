@@ -9,7 +9,7 @@ type nodeTests []struct {
 	original, node Data
 }
 
-func nodeTest(t *testing.T, tests nodeTests, nodeName string) {
+func nodeTesting(t *testing.T, tests nodeTests, nodeName string) {
 	for index, test := range tests {
 
 		// checking the node methods
@@ -324,7 +324,7 @@ var CombineNodeTests = nodeTests{
 }
 
 func TestCombineNode(t *testing.T) {
-	nodeTest(t, CombineNodeTests, "CombineNode")
+	nodeTesting(t, CombineNodeTests, "CombineNode")
 }
 
 var CombineTests = []struct {
@@ -470,7 +470,7 @@ var RSNodeTests = nodeTests{
 }
 
 func TestRSNode(t *testing.T) {
-	nodeTest(t, RSNodeTests, "rsNode")
+	nodeTesting(t, RSNodeTests, "rsNode")
 }
 
 var RandomSelectionTests = []struct {
@@ -581,7 +581,7 @@ var EANodeTestCases = nodeTests{
 }
 
 func TestEANode(t *testing.T) {
-	nodeTest(t, EANodeTestCases, "eaNode")
+	nodeTesting(t, EANodeTestCases, "eaNode")
 }
 
 var IncludeParamsTestCases = []struct {
