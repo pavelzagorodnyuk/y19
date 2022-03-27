@@ -559,3 +559,87 @@ func BenchmarkRandomSelection(b *testing.B) {
 		RandomSelection(mainTableA, i%mainTableA.Length())
 	}
 }
+
+var EANodeTestCases = nodeTests{
+	{
+		original: bitOfTableA{
+			{0.00, "a", true, -64 + 0, -64 + 0, 64 + 0, 64 + 0},
+			{0.01, "b", true, -64 + 1, -64 + 1, 64 + 1, 64 + 1},
+			{0.02, "c", true, -64 + 2, -64 + 2, 64 + 2, 64 + 2},
+			{0.03, "d", true, -64 + 3, -64 + 3, 64 + 3, 64 + 3},
+			{0.04, "e", true, -64 + 4, -64 + 4, 64 + 4, 64 + 4},
+			{0.05, "f", true, -64 + 5, -64 + 5, 64 + 5, 64 + 5},
+			{0.06, "g", true, -64 + 6, -64 + 6, 64 + 6, 64 + 6},
+			{0.07, "h", true, -64 + 7, -64 + 7, 64 + 7, 64 + 7},
+			{0.00, "a", true, -64 + 0, -64 + 0, 64 + 0, 64 + 0},
+		},
+		node: &eaNode{
+			Data:       mainTableA,
+			allocation: []int{0, 2, 3, 4, 5, 9, 10},
+		},
+	},
+}
+
+func TestEANode(t *testing.T) {
+	nodeTest(t, EANodeTestCases, "eaNode")
+}
+
+var IncludeParamsTestCases = []struct {
+	name                  string
+	input, expectedOutput Data
+	attributeNumbers      []int
+}{
+	{
+		name:             "OK",
+		input:            mainTableA,
+		attributeNumbers: []int{0, 2, 3, 4, 5, 9, 10},
+		expectedOutput:   mainBitA,
+	},
+	{
+		name:             "Empty array of attribute numbers",
+		input:            mainTableA,
+		attributeNumbers: []int{},
+		expectedOutput:   nil,
+	},
+	{
+		name:             "Nil array of attribute numbers",
+		input:            mainTableA,
+		attributeNumbers: nil,
+		expectedOutput:   nil,
+	},
+	{
+		name:             "Array contains an incorrect number (#1)",
+		input:            mainTableA,
+		attributeNumbers: []int{0, -1, 1, 2},
+		expectedOutput:   nil,
+	},
+	{
+		name:             "Array contains an incorrect number (#2)",
+		input:            mainTableA,
+		attributeNumbers: []int{0, 999, 1, 2},
+		expectedOutput:   nil,
+	},
+}
+
+func TestExtractAttributes(t *testing.T) {
+	for _, test := range IncludeParamsTestCases {
+		t.Run(test.name, func(t *testing.T) {
+			result := ExtractAttributes(test.input, test.attributeNumbers...)
+
+			if test.expectedOutput == nil && result != nil || test.expectedOutput != nil && result == nil {
+				t.Errorf("the result does not match the expected")
+				return
+			}
+
+			if test.expectedOutput != nil && !AreEqual(test.expectedOutput, result) {
+				t.Errorf("the attributes of the original selection are distributed incorrectly")
+			}
+		})
+	}
+}
+
+func BenchmarkExtractAttributes(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		ExtractAttributes(mainTableA, 0, 2, 3, 4, 5, 9, 10)
+	}
+}

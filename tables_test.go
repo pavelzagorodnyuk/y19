@@ -201,6 +201,60 @@ func (t tableX) Value(_, _ int) interface{} {
 	return nil
 }
 
+type bitOfTableA []struct {
+	a float64
+	b string
+	c bool
+	d int
+	e int64
+	f uint
+	g uint64
+}
+
+func (t bitOfTableA) Length() int {
+	return len(t)
+}
+
+func (t bitOfTableA) Dimension() int {
+	return 7
+}
+
+func (t bitOfTableA) Scale(p int) Scale {
+	switch p {
+	case 0, 3, 4, 5, 6:
+		return AbsoluteScale
+	case 1, 2:
+		return NominalScale
+	default:
+		return IndefiniteScale
+	}
+}
+
+func (t bitOfTableA) Value(o, p int) interface{} {
+	if o < 0 || o >= len(t) {
+		return nil
+	}
+
+	switch p {
+	case 0:
+		return t[o].a
+	case 1:
+		return t[o].b
+	case 2:
+		return t[o].c
+	case 3:
+		return t[o].d
+	case 4:
+		return t[o].e
+	case 5:
+		return t[o].f
+	case 6:
+		return t[o].g
+	default:
+		return nil
+	}
+}
+
 var (
 	mainTableA = tableA{
 		{0.00, 10.00, "a", true, -64 + 0, -64 + 0, -32 + 0, -16 + 0, -8 + 0, 64 + 0, 64 + 0, 32 + 0, 16 + 0, 8 + 0},
@@ -241,4 +295,16 @@ var (
 	mainTableX = tableX{}
 
 	emptyTable = tableA{}
+
+	mainBitA = bitOfTableA{
+		{0.00, "a", true, -64 + 0, -64 + 0, 64 + 0, 64 + 0},
+		{0.01, "b", true, -64 + 1, -64 + 1, 64 + 1, 64 + 1},
+		{0.02, "c", true, -64 + 2, -64 + 2, 64 + 2, 64 + 2},
+		{0.03, "d", true, -64 + 3, -64 + 3, 64 + 3, 64 + 3},
+		{0.04, "e", true, -64 + 4, -64 + 4, 64 + 4, 64 + 4},
+		{0.05, "f", true, -64 + 5, -64 + 5, 64 + 5, 64 + 5},
+		{0.06, "g", true, -64 + 6, -64 + 6, 64 + 6, 64 + 6},
+		{0.07, "h", true, -64 + 7, -64 + 7, 64 + 7, 64 + 7},
+		{0.00, "a", true, -64 + 0, -64 + 0, 64 + 0, 64 + 0},
+	}
 )
