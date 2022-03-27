@@ -312,6 +312,49 @@ func RandomSelection(selection Data, n int) (Data, Data) {
 	return selection1, selection2
 }
 
+type eaNode struct {
+	Data
+	allocation []int
+}
+
+func (node *eaNode) Dimension() int {
+	return len(node.allocation)
+}
+
+func (node *eaNode) Scale(p int) Scale {
+	if p < 0 || p >= len(node.allocation) {
+		return IndefiniteScale
+	}
+
+	return node.Data.Scale(node.allocation[p])
+}
+
+func (node *eaNode) Value(o, p int) interface{} {
+	if p < 0 || p >= len(node.allocation) {
+		return nil
+	}
+
+	return node.Data.Value(o, node.allocation[p])
+}
+
+// ExtractAttributes returns a selection that includes attributes from the original selection
+// whose numbers are listed in attributeNumbers
+func ExtractAttributes(selection Data, attributeNumbers ...int) Data {
+
+	if selection == nil || len(attributeNumbers) == 0 {
+		return nil
+	}
+
+	var dimension = selection.Dimension()
+	for _, number := range attributeNumbers {
+		if number < 0 || number >= dimension {
+			return nil
+		}
+	}
+
+	return &eaNode{Data: selection, allocation: attributeNumbers}
+}
+
 func interfaceToFloat64(source interface{}) (float64, bool) {
 
 	var value float64 = math.NaN()
