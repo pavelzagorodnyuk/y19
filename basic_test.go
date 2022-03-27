@@ -56,6 +56,35 @@ func nodeTesting(t *testing.T, tests nodeTests, nodeName string) {
 	}
 }
 
+func nodeBenchmarking(b *testing.B, node Data) {
+	b.Run("Length", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			node.Length()
+		}
+	})
+
+	b.Run("Dimension", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			node.Dimension()
+		}
+	})
+
+	b.Run("Scale", func(b *testing.B) {
+		var dimension int = node.Dimension()
+		for i := 0; i < b.N; i++ {
+			node.Scale(i % dimension)
+		}
+	})
+
+	b.Run("Value", func(b *testing.B) {
+		var dimension int = node.Dimension()
+		var length int = node.Length()
+		for i := 0; i < b.N; i++ {
+			node.Value((i/dimension)%length, i%dimension)
+		}
+	})
+}
+
 var AreEqualTests = []struct {
 	selectionOne, selectionTwo Data
 	isEqual                    bool
