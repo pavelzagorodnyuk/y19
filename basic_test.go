@@ -356,6 +356,11 @@ func TestCombineNode(t *testing.T) {
 	nodeTesting(t, CombineNodeTests, "CombineNode")
 }
 
+func BenchmarkCombineNode(b *testing.B) {
+	node := Combine(mainTableA, mainTableA)
+	nodeBenchmarking(b, node)
+}
+
 var CombineTests = []struct {
 	fullTable  Data
 	tableParts []Data
@@ -502,6 +507,11 @@ func TestRSNode(t *testing.T) {
 	nodeTesting(t, RSNodeTests, "rsNode")
 }
 
+func BenchmarkRSNode(b *testing.B) {
+	node, _ := RandomSelection(mainTableA, mainTableA.Length())
+	nodeBenchmarking(b, node)
+}
+
 var RandomSelectionTests = []struct {
 	selection Data
 	n         int
@@ -611,6 +621,11 @@ var EANodeTestCases = nodeTests{
 
 func TestEANode(t *testing.T) {
 	nodeTesting(t, EANodeTestCases, "eaNode")
+}
+
+func BenchmarkEANode(b *testing.B) {
+	node := ExtractAttributes(mainTableA, 0, 2, 3, 4, 5, 9, 10)
+	nodeBenchmarking(b, node)
 }
 
 var IncludeParamsTestCases = []struct {
