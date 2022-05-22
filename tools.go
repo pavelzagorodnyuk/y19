@@ -46,6 +46,45 @@ func interfaceToFloat64(source interface{}) (float64, bool) {
 	case uint8:
 		value = float64(source.(uint8))
 		ok = true
+
+	case *float64:
+		value = *(source.(*float64))
+		ok = true
+	case *float32:
+		value = float64(*(source.(*float32)))
+		ok = true
+
+	case *int:
+		value = float64(*(source.(*int)))
+		ok = true
+	case *int64:
+		value = float64(*(source.(*int64)))
+		ok = true
+	case *int32:
+		value = float64(*(source.(*int32)))
+		ok = true
+	case *int16:
+		value = float64(*(source.(*int16)))
+		ok = true
+	case *int8:
+		value = float64(*(source.(*int8)))
+		ok = true
+
+	case *uint:
+		value = float64(*(source.(*uint)))
+		ok = true
+	case *uint64:
+		value = float64(*(source.(*uint64)))
+		ok = true
+	case *uint32:
+		value = float64(*(source.(*uint32)))
+		ok = true
+	case *uint16:
+		value = float64(*(source.(*uint16)))
+		ok = true
+	case *uint8:
+		value = float64(*(source.(*uint8)))
+		ok = true
 	}
 
 	return value, ok
